@@ -120,7 +120,7 @@ print(sigma_wynik)
 print(odchylenie_stnd_srednia)
 
 print(wynik)
-print()
+
 
 
 
