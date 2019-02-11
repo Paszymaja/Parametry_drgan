@@ -5,7 +5,6 @@ wb = openpyxl.load_workbook('dane.xlsx')
 arkusz = wb['Arkusz1']
 
 
-
 def wczytanie_danych(sheet):
     tab = []
     for row_i in range(2, 62):
@@ -98,6 +97,26 @@ def sigma(odchylenie, odchylenie_srednia):
     return a
 
 
+def a_epicentralne(odleglosc, wyniki):
+    tab = []
+    for i in range(4):
+        a = 0
+        a = np.sqrt(pow(odleglosc[i], 2) + pow(500, 2))
+        a = pow(10, (wyniki[0] * np.log10(200000)) + (wyniki[1] * np.log10(a)) + (wyniki[2] * a) + wyniki[3])
+        tab.append(a)
+    mat = np.array(tab).reshape(4, 1)
+    return mat
+
+
+def a_epicentralne_uf(a_epic, sigma):
+    lam = 1.6707
+    tab = []
+    for i in range(4):
+        tab.append(pow(10, np.log10(a_epic[i]) + (sigma * lam)))
+    mat = np.array(tab).reshape(4, 1)
+    return mat
+
+
 macierz_danych = wczytanie_danych(arkusz)
 stanowiska = wczytanie_stanowisk(arkusz)
 odl_ep = odleglosci_epicentralne()
@@ -114,12 +133,25 @@ macierzY_prog = macierz_y_prog(macierzA, wynik)
 odchylenie_stnd = odchylenie_standardowe(macierzY, macierzY_prog)
 odchylenie_stnd_srednia = sum(odchylenie_stnd)/60
 sigma_wynik = sigma(odchylenie_stnd, odchylenie_stnd_srednia)
+A_epicentralne = a_epicentralne(odl_ep, wynik)
+A_epicentralne_UF = a_epicentralne_uf(A_epicentralne, sigma_wynik)
 
+print("Wynik")
+print(wynik)
 
+print('A_epicentralne')
+print(A_epicentralne)
+
+print('A_epicentralne_UF')
+print(A_epicentralne_UF)
+
+print('sigma_wynik')
 print(sigma_wynik)
+
+print('odchylenie_stnd_srednia')
 print(odchylenie_stnd_srednia)
 
-print(wynik)
+
 
 
 
