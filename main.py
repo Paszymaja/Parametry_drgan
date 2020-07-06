@@ -1,26 +1,18 @@
 import openpyxl
 import numpy as np
 
-wb = openpyxl.load_workbook('dane.xlsx')
+wb = openpyxl.load_workbook('data/dane.xlsx')
 arkusz = wb['Arkusz1']
 
 
 def wczytanie_danych(sheet):
-    tab = []
-    for row_i in range(2, 62):
-        for column_i in range(1, 8):
-            x1 = float(sheet.cell(row_i, column_i).value)
-            tab.append(x1)
-    mat = np.array(tab).reshape(60, 7)
+    tab = [float(sheet.cell(row_i, column_i).value) for row_i in range(2, 62) for column_i in range(1, 8)]
+    mat = np.array(tab).reshape(3, 3)
     return mat
 
 
 def wczytanie_stanowisk(sheet):
-    tab = []
-    for row_i in range(2, 5):
-        for column_i in range(9, 12):
-            x1 = float(sheet.cell(row_i, column_i).value)
-            tab.append(x1)
+    tab = [float(sheet.cell(row_i, column_i).value) for row_i in range(2, 5) for column_i in range(9, 12)]
     mat = np.array(tab).reshape(3, 3)
     return mat
 
