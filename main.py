@@ -27,9 +27,12 @@ def wczytanie_stanowisk(sheet):
 
 def macierz_a(macierz, macierz_stanowisk):
     tab = []
-    value = lambda a, b: np.sqrt(pow(macierz[i][3] - macierz_stanowisk[a][b], 2) +
-                                 pow(macierz[i][4] - macierz_stanowisk[a][b+1], 2) +
-                                 pow(500, 2))
+
+    def value(a, b):
+        return np.sqrt(pow(macierz[i][3] - macierz_stanowisk[a][b], 2) +
+                       pow(macierz[i][4] - macierz_stanowisk[a][b + 1], 2) +
+                       pow(500, 2))
+
     for i in range(60):
         for j in range(4):
             if j == 0:
@@ -55,36 +58,26 @@ def macierz_a(macierz, macierz_stanowisk):
 
 
 def macierz_y(macierz):
-    tab = []
-    for i in range(60):
-        for j in range(1):
-            tab.append(np.log10(macierz[i][5]))
-    mat = np.array(tab).reshape(60, 1)
-    return mat
+    tab = [np.log10(macierz[i][5]) for i in range(60)]
+    return np.array(tab).reshape(60, 1)
 
 
 def odleglosci_epicentralne():
-    tab = []
-    a = 0
-    for i in range(4):
-        tab.append(a)
-        a = a + 500
-    return tab
+    return np.arange(0, 2000, 500).tolist()
 
 
 def macierz_y_prog(macierz, wyniki):
     tab = []
     for i in range(60):
         for j in range(1):
-            tab.append((wyniki[0] * macierz[i][0])+(wyniki[1]*macierz[i][1]) + (wyniki[2]*macierz[i][2]) + wyniki[3])
+            tab.append(
+                (wyniki[0] * macierz[i][0]) + (wyniki[1] * macierz[i][1]) + (wyniki[2] * macierz[i][2]) + wyniki[3])
     mat = np.array(tab).reshape(60, 1)
     return mat
 
 
 def odchylenie_standardowe(macierz, macierz_prog):
-    tab = []
-    for i in range(60):
-        tab.append(macierz[i][0]+macierz_prog[i][0])
+    tab = [macierz[i][0] + macierz_prog[i][0] for i in range(60)]
     mat = np.array(tab).reshape(60, 1)
     return mat
 
@@ -92,15 +85,14 @@ def odchylenie_standardowe(macierz, macierz_prog):
 def sigma(odchylenie, odchylenie_srednia):
     a = 0
     for i in range(60):
-        a = a + pow(odchylenie[i] - odchylenie_srednia, 2)
-    a = np.sqrt(a)/59
+        a += pow(odchylenie[i] - odchylenie_srednia, 2)
+    a = np.sqrt(a) / 59
     return a
 
 
 def a_epicentralne(odleglosc, wyniki):
     tab = []
     for i in range(4):
-        a = 0
         a = np.sqrt(pow(odleglosc[i], 2) + pow(500, 2))
         a = pow(10, (wyniki[0] * np.log10(200000)) + (wyniki[1] * np.log10(a)) + (wyniki[2] * a) + wyniki[3])
         tab.append(a)
@@ -117,54 +109,41 @@ def a_epicentralne_uf(a_epic, sigma):
     return mat
 
 
-macierz_danych = wczytanie_danych(arkusz)
-stanowiska = wczytanie_stanowisk(arkusz)
-odl_ep = odleglosci_epicentralne()
+def main():
+    macierz_danych = wczytanie_danych(arkusz)
+    stanowiska = wczytanie_stanowisk(arkusz)
+    odl_ep = odleglosci_epicentralne()
 
-macierzA = macierz_a(macierz_danych, stanowiska)
-macierzY = macierz_y(macierz_danych)
+    macierzA = macierz_a(macierz_danych, stanowiska)
+    macierzY = macierz_y(macierz_danych)
 
-macierzT = macierzA.transpose()
-macierzA_mnozona = np.dot(macierzT, macierzA)
-macierzY_mnozona = np.dot(macierzT, macierzY)
+    macierzT = macierzA.transpose()
+    macierzA_mnozona = np.dot(macierzT, macierzA)
+    macierzY_mnozona = np.dot(macierzT, macierzY)
 
-wynik = np.linalg.solve(macierzA_mnozona, macierzY_mnozona)
-macierzY_prog = macierz_y_prog(macierzA, wynik)
-odchylenie_stnd = odchylenie_standardowe(macierzY, macierzY_prog)
-odchylenie_stnd_srednia = sum(odchylenie_stnd)/60
-sigma_wynik = sigma(odchylenie_stnd, odchylenie_stnd_srednia)
-A_epicentralne = a_epicentralne(odl_ep, wynik)
-A_epicentralne_UF = a_epicentralne_uf(A_epicentralne, sigma_wynik)
+    wynik = np.linalg.solve(macierzA_mnozona, macierzY_mnozona)
+    macierzY_prog = macierz_y_prog(macierzA, wynik)
+    odchylenie_stnd = odchylenie_standardowe(macierzY, macierzY_prog)
+    odchylenie_stnd_srednia = sum(odchylenie_stnd) / 60
+    sigma_wynik = sigma(odchylenie_stnd, odchylenie_stnd_srednia)
+    A_epicentralne = a_epicentralne(odl_ep, wynik)
+    A_epicentralne_UF = a_epicentralne_uf(A_epicentralne, sigma_wynik)
 
-print("Wynik")
-print(wynik)
+    print("Wynik")
+    print(wynik)
 
-print('A_epicentralne')
-print(A_epicentralne)
+    print('A_epicentralne')
+    print(A_epicentralne)
 
-print('A_epicentralne_UF')
-print(A_epicentralne_UF)
+    print('A_epicentralne_UF')
+    print(A_epicentralne_UF)
 
-print('sigma_wynik')
-print(sigma_wynik)
+    print('sigma_wynik')
+    print(sigma_wynik)
 
-print('odchylenie_stnd_srednia')
-print(odchylenie_stnd_srednia)
-
-
-
+    print('odchylenie_stnd_srednia')
+    print(odchylenie_stnd_srednia)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+if __name__ == '__main__':
+    main()
