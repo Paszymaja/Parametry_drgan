@@ -63,15 +63,17 @@ def macierz_y(macierz):
 
 
 def odleglosci_epicentralne():
-    return np.arange(0, 2000, 500).tolist()
+    data_list = np.arange(0, 2000, 500)
+    data_list.tolist()
+    return data_list
 
 
 def macierz_y_prog(macierz, wyniki):
-    tab = []
-    for i in range(60):
-        for j in range(1):
-            tab.append(
-                (wyniki[0] * macierz[i][0]) + (wyniki[1] * macierz[i][1]) + (wyniki[2] * macierz[i][2]) + wyniki[3])
+    tab = [(wyniki[0] * macierz[i][0])
+           + (wyniki[1] * macierz[i][1])
+           + (wyniki[2] * macierz[i][2])
+           + wyniki[3]
+           for i in range(60)]
     mat = np.array(tab).reshape(60, 1)
     return mat
 
@@ -100,11 +102,9 @@ def a_epicentralne(odleglosc, wyniki):
     return mat
 
 
-def a_epicentralne_uf(a_epic, sigma):
+def a_epicentralne_uf(a_epic, sigma_val):
     lam = 1.6707
-    tab = []
-    for i in range(4):
-        tab.append(pow(10, np.log10(a_epic[i]) + (sigma * lam)))
+    tab = [pow(10, np.log10(a_epic[i]) + (sigma_val * lam)) for i in range(4)]
     mat = np.array(tab).reshape(4, 1)
     return mat
 
