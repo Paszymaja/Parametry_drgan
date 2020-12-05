@@ -7,7 +7,7 @@ arkusz = wb['Arkusz1']
 
 def wczytanie_danych(sheet):
     tab = [float(sheet.cell(row_i, column_i).value) for row_i in range(2, 62) for column_i in range(1, 8)]
-    mat = np.array(tab).reshape(3, 3)
+    mat = np.array(tab).reshape(60, 7)
     return mat
 
 
